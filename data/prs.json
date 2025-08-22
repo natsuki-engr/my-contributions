@@ -1,0 +1,247 @@
+[
+  {
+    "id": 3243265788,
+    "number": 308,
+    "title": "[PHP 8.4] Curl new options and constants #4069 を取り込み",
+    "body": "constants.xml と constants_curl_getinfo.xml に関してはファイル全体が未翻訳なので原文のまま取り込んでいます。",
+    "html_url": "https://github.com/php/doc-ja/pull/308",
+    "state": "merged",
+    "created_at": "2025-07-18T13:39:19Z",
+    "updated_at": "2025-08-05T01:35:23Z",
+    "merged_at": "2025-08-05T01:35:23Z",
+    "repository": {
+      "name": "doc-ja",
+      "full_name": "php/doc-ja",
+      "html_url": "https://github.com/php/doc-ja",
+      "description": "Japanese translation of the PHP documentation",
+      "language": "XML",
+      "stars": 86
+    },
+    "labels": []
+  },
+  {
+    "id": 3096058173,
+    "number": 5,
+    "title": "add version number in package.json and .nvmrc",
+    "body": "It is hard to find which node version should be selected when contributing. In my case, node v20.16.0 didn't work `npm run compile` and other scripts.\r\nError like this https://github.com/mhutchie/vscode-git-graph/issues/719#issuecomment-2378954588 was shown.\r\n\r\nI identified node version `18.17.1` as the version which script does not fails with, grepping all package.json files in node_modules.\r\n\r\nref: https://barrd.dev/article/find-which-node-version-an-old-project-requires/\r\n\r\nIf there are any other safe versions, it should be edited to include them.",
+    "html_url": "https://github.com/git-hub-tig/vscode-git-graph/pull/5",
+    "state": "open",
+    "created_at": "2025-05-28T05:19:44Z",
+    "updated_at": "2025-06-11T02:45:26Z",
+    "merged_at": null,
+    "repository": {
+      "name": "vscode-git-graph",
+      "full_name": "git-hub-tig/vscode-git-graph",
+      "html_url": "https://github.com/git-hub-tig/vscode-git-graph",
+      "description": "Fork of Michael Hutchisons repository with some updates.",
+      "language": "TypeScript",
+      "stars": 56
+    },
+    "labels": []
+  },
+  {
+    "id": 3096034741,
+    "number": 4,
+    "title": "select all text in field when widget called",
+    "body": "Summary of the issue:\r\ntext in field are selected when widget opened like browser.\r\n",
+    "html_url": "https://github.com/git-hub-tig/vscode-git-graph/pull/4",
+    "state": "open",
+    "created_at": "2025-05-28T05:06:56Z",
+    "updated_at": "2025-05-28T05:06:56Z",
+    "merged_at": null,
+    "repository": {
+      "name": "vscode-git-graph",
+      "full_name": "git-hub-tig/vscode-git-graph",
+      "html_url": "https://github.com/git-hub-tig/vscode-git-graph",
+      "description": "Fork of Michael Hutchisons repository with some updates.",
+      "language": "TypeScript",
+      "stars": 56
+    },
+    "labels": []
+  },
+  {
+    "id": 2829096194,
+    "number": 1699,
+    "title": "adding attribute examples",
+    "body": "- [x] faq\r\n- [x] common techniques\r\n- [x] cookbook",
+    "html_url": "https://github.com/zircote/swagger-php/pull/1699",
+    "state": "merged",
+    "created_at": "2025-02-04T04:29:36Z",
+    "updated_at": "2025-05-14T08:20:53Z",
+    "merged_at": "2025-05-14T08:07:38Z",
+    "repository": {
+      "name": "swagger-php",
+      "full_name": "zircote/swagger-php",
+      "html_url": "https://github.com/zircote/swagger-php",
+      "description": "A php swagger annotation and parsing library",
+      "language": "PHP",
+      "stars": 5232
+    },
+    "labels": []
+  },
+  {
+    "id": 3036875328,
+    "number": 296,
+    "title": "[PHP 8.4] odbc_fetch_row() can emit a E_WARNING を取り込み",
+    "body": "https://github.com/php/doc-en/pull/4258 を反映しました。",
+    "html_url": "https://github.com/php/doc-ja/pull/296",
+    "state": "merged",
+    "created_at": "2025-05-02T21:38:40Z",
+    "updated_at": "2025-05-03T12:42:58Z",
+    "merged_at": "2025-05-03T12:42:58Z",
+    "repository": {
+      "name": "doc-ja",
+      "full_name": "php/doc-ja",
+      "html_url": "https://github.com/php/doc-ja",
+      "description": "Japanese translation of the PHP documentation",
+      "language": "XML",
+      "stars": 86
+    },
+    "labels": []
+  },
+  {
+    "id": 2998566467,
+    "number": 1182,
+    "title": "fix display of icon in callout",
+    "body": "<!---☝️ PR title should follow conventional commits (https://conventionalcommits.org) -->\r\n\r\n### 🔗 Linked issue\r\n\r\n#1181 \r\n\r\n### ❓ Type of change\r\n\r\n- [x] 📖 Documentation (updates to the documentation, readme or JSdoc annotations)\r\n- [ ] 🐞 Bug fix (a non-breaking change that fixes an issue)\r\n- [ ] 👌 Enhancement (improving an existing functionality like performance)\r\n- [ ] ✨ New feature (a non-breaking change that adds functionality)\r\n- [ ] 🧹 Chore (updates to the build process or auxiliary tools and libraries)\r\n- [ ] ⚠️ Breaking change (fix or feature that would cause existing functionality to change)\r\n\r\n### 📚 Description\r\n\r\nfix mustache syntax in `Callout.vue` to be shown content of `icon` in props.\r\n\r\n### 📸 Screenshots (if appropriate)\r\n\r\nfixed:\r\n![image](https://github.com/user-attachments/assets/cc441ab2-8947-4404-b57a-e33517748902)\r\n\r\n### 📝 Checklist\r\n\r\n- [x] I have linked an issue or discussion.\r\n- [x] I have updated the documentation accordingly.\r\n",
+    "html_url": "https://github.com/unovue/shadcn-vue/pull/1182",
+    "state": "merged",
+    "created_at": "2025-04-16T06:22:45Z",
+    "updated_at": "2025-04-16T07:10:21Z",
+    "merged_at": "2025-04-16T07:10:21Z",
+    "repository": {
+      "name": "shadcn-vue",
+      "full_name": "unovue/shadcn-vue",
+      "html_url": "https://github.com/unovue/shadcn-vue",
+      "description": "Vue port of shadcn-ui",
+      "language": "Vue",
+      "stars": 8045
+    },
+    "labels": []
+  },
+  {
+    "id": 2934552362,
+    "number": 26496,
+    "title": "[ja] サンプルコードの間違いを修正",
+    "body": "### Description\r\n\r\nサンプルコードを修正\r\n\r\n### Motivation\r\n\r\nselectionchangeイベントのリスナーの登録方法についての例がscrollイベントのものになっていたので修正\r\n",
+    "html_url": "https://github.com/mdn/translated-content/pull/26496",
+    "state": "merged",
+    "created_at": "2025-03-20T08:44:02Z",
+    "updated_at": "2025-03-21T17:36:39Z",
+    "merged_at": "2025-03-21T17:36:38Z",
+    "repository": {
+      "name": "translated-content",
+      "full_name": "mdn/translated-content",
+      "html_url": "https://github.com/mdn/translated-content",
+      "description": "The source repository of all translated content for MDN Web Docs",
+      "language": "Markdown",
+      "stars": 1867
+    },
+    "labels": [
+      {
+        "name": "l10n-ja",
+        "color": "F27E7B"
+      }
+    ]
+  },
+  {
+    "id": 2760383293,
+    "number": 230,
+    "title": "[PHP8.4] Pharの翻訳",
+    "body": null,
+    "html_url": "https://github.com/php/doc-ja/pull/230",
+    "state": "merged",
+    "created_at": "2024-12-27T04:39:36Z",
+    "updated_at": "2024-12-27T07:10:26Z",
+    "merged_at": "2024-12-27T06:32:40Z",
+    "repository": {
+      "name": "doc-ja",
+      "full_name": "php/doc-ja",
+      "html_url": "https://github.com/php/doc-ja",
+      "description": "Japanese translation of the PHP documentation",
+      "language": "XML",
+      "stars": 86
+    },
+    "labels": []
+  },
+  {
+    "id": 2679582844,
+    "number": 180,
+    "title": "[PHP8.4] die,exitの翻訳",
+    "body": "https://github.com/php/doc-en/pull/4070",
+    "html_url": "https://github.com/php/doc-ja/pull/180",
+    "state": "merged",
+    "created_at": "2024-11-21T13:57:24Z",
+    "updated_at": "2024-11-30T05:59:53Z",
+    "merged_at": "2024-11-30T05:59:53Z",
+    "repository": {
+      "name": "doc-ja",
+      "full_name": "php/doc-ja",
+      "html_url": "https://github.com/php/doc-ja",
+      "description": "Japanese translation of the PHP documentation",
+      "language": "XML",
+      "stars": 86
+    },
+    "labels": []
+  },
+  {
+    "id": 1843614628,
+    "number": 6,
+    "title": "Add vanilla slash example",
+    "body": "I added a slash-plugin example with vanilla ts for my understanding.\r\n\r\nAs this is my first time sending PR in an OSS project, please let me know if there are any mistakes.",
+    "html_url": "https://github.com/Milkdown/examples/pull/6",
+    "state": "merged",
+    "created_at": "2023-08-09T16:19:22Z",
+    "updated_at": "2024-06-23T02:29:14Z",
+    "merged_at": "2024-06-23T02:29:14Z",
+    "repository": {
+      "name": "examples",
+      "full_name": "Milkdown/examples",
+      "html_url": "https://github.com/Milkdown/examples",
+      "description": "A list of examples to play with milkdown.",
+      "language": "TypeScript",
+      "stars": 40
+    },
+    "labels": []
+  },
+  {
+    "id": 2334779023,
+    "number": 2,
+    "title": "Update variables",
+    "body": "An update of css variables in index.js according to the comment written in index.js.",
+    "html_url": "https://github.com/githubocto/tailwind-vscode/pull/2",
+    "state": "open",
+    "created_at": "2024-06-05T02:38:44Z",
+    "updated_at": "2024-06-05T02:38:44Z",
+    "merged_at": null,
+    "repository": {
+      "name": "tailwind-vscode",
+      "full_name": "githubocto/tailwind-vscode",
+      "html_url": "https://github.com/githubocto/tailwind-vscode",
+      "description": null,
+      "language": "JavaScript",
+      "stars": 40
+    },
+    "labels": []
+  },
+  {
+    "id": 1916630962,
+    "number": 1130,
+    "title": "fix: typo of 'redo'",
+    "body": "<!--\r\nThanks for submitting a pull request!\r\nWe appreciate you spending the time to work on these changes.\r\n\r\n⚠️ If you're adding a new plugin, please make sure you've already created issues or discussions where we have discussed about it. Currently we encourage you to publish your own community plugins. And we're very cautious about adding new official plugins.\r\n-->\r\n\r\n-   [X] I read the contributing guide <!-- https://github.com/Saul-Mirone/milkdown/blob/main/CONTRIBUTING.md -->\r\n-   [X] I agree to follow the code of conduct <!-- https://github.com/Saul-Mirone/milkdown/blob/main/CODE_OF_CONDUCT.md -->\r\n\r\n## Summary\r\n\r\ntypo\r\n\r\n## How did you test this change?\r\n",
+    "html_url": "https://github.com/Milkdown/milkdown/pull/1130",
+    "state": "merged",
+    "created_at": "2023-09-28T03:14:31Z",
+    "updated_at": "2023-10-25T21:47:26Z",
+    "merged_at": "2023-10-09T10:50:05Z",
+    "repository": {
+      "name": "milkdown",
+      "full_name": "Milkdown/milkdown",
+      "html_url": "https://github.com/Milkdown/milkdown",
+      "description": "🍼 Plugin driven WYSIWYG  markdown editor framework.",
+      "language": "TypeScript",
+      "stars": 10413
+    },
+    "labels": []
+  }
+]

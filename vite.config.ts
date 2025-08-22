@@ -1,14 +1,27 @@
-import build from '@hono/vite-build/cloudflare-pages'
-import devServer from '@hono/vite-dev-server'
-import adapter from '@hono/vite-dev-server/cloudflare'
-import { defineConfig } from 'vite'
+import build from "@hono/vite-build";
+import devServer from "@hono/vite-dev-server";
+import ssg from "@hono/vite-ssg";
+import { defineConfig } from "vite";
 
-export default defineConfig({
-  plugins: [
-    build(),
-    devServer({
-      adapter,
-      entry: 'src/index.tsx'
-    })
-  ]
-})
+export default defineConfig(({ mode }) => {
+  if (mode === "ssg") {
+    return {
+      plugins: [
+        ssg({
+          entry: "src/app.tsx",
+        }),
+      ],
+    };
+  }
+
+  return {
+    plugins: [
+      build({
+        entry: "src/app.tsx",
+      }),
+      devServer({
+        entry: "src/app.tsx",
+      }),
+    ],
+  };
+});
