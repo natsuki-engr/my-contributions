@@ -88,7 +88,9 @@ app.get("/", (c) => {
   return c.html(
     <html lang="en">
       <head>
-        <title>{data ? `${data.user_name}'s Contributions` : "My Contributions"}</title>
+        <title>
+          {data ? `${data.user_name}'s Contributions` : "My Contributions"}
+        </title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <style>{`
           :root {
@@ -223,10 +225,16 @@ app.get("/", (c) => {
                       </div>
                     </div>
                     <div class="pr-meta">
-                      <a href={pr.url} target="_blank" rel="noopener noreferrer">
+                      <a
+                        href={pr.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
                         <span class="pr-number">#{pr.number}</span>
-                        <span class="pr-date">{timeAgo(pr.created_at)}</span>
                       </a>
+                      <span class="pr-date" title={pr.created_at}>
+                        {timeAgo(pr.created_at)}
+                      </span>
                     </div>
                   </article>
                 ))}
