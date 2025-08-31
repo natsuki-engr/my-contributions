@@ -8,250 +8,236 @@ interface PR {
   title: string;
   url: string;
   created_at: string;
-  state: string;
+  state: "merged" | "closed" | "open";
   number: number;
 }
 
-function loadPRs(): PR[] {
+interface PRData {
+  user: string;
+  user_name: string;
+  avatar: string;
+  fetched_at: string;
+  total_count: number;
+  prs: PR[];
+}
+
+function loadPRsData(): PRData | null {
   try {
-    if (!existsSync("data/prs.json")) {
-      return [];
+    const path = "data/prs.json";
+    if (!existsSync(path)) {
+      console.log("data/prs.json not found.");
+      return null;
     }
-    const data = readFileSync("data/prs.json", "utf-8");
-    const jsonData = JSON.parse(data);
-    // prs.jsonの構造に応じてデータを取得
-    return jsonData.prs || jsonData || [];
+    const data = readFileSync(path, "utf-8");
+    return JSON.parse(data);
   } catch (error) {
-    console.error("Error loading PRs:", error);
-    return [];
+    console.error("Error loading or parsing prs.json:", error);
+    return null;
   }
 }
 
-function formatDate(dateString: string): string {
-  return new Date(dateString).toLocaleDateString("ja-JP");
+function timeAgo(dateString: string): string {
+  const now = new Date();
+  const past = new Date(dateString);
+  const diffInSeconds = Math.floor((now.getTime() - past.getTime()) / 1000);
+
+  const intervals = {
+    year: 31536000,
+    month: 2592000,
+    week: 604800,
+    day: 86400,
+    hour: 3600,
+    minute: 60,
+    second: 1,
+  };
+
+  for (const [intervalName, seconds] of Object.entries(intervals)) {
+    const intervalCount = Math.floor(diffInSeconds / seconds);
+    if (intervalCount >= 1) {
+      return `${intervalCount} ${intervalName}${intervalCount > 1 ? "s" : ""} ago`;
+    }
+  }
+  return "just now";
 }
 
-function getStateIcon(state: string): string {
-  if (state === "merged") return "🟣";
-  if (state === "closed") return "🔴";
-  if (state === "open") return "🟢";
-  return "⚪";
-}
+const PullRequestIcon = ({ state }: { state: PR["state"] }) => {
+  const color = {
+    open: "#2da44e", // green
+    merged: "#8250df", // purple
+    closed: "#cf222e", // red
+  }[state];
+
+  return (
+    <svg
+      viewBox="0 0 16 16"
+      version="1.1"
+      width="16"
+      height="16"
+      aria-hidden="true"
+      style={{ fill: color, marginRight: "8px", verticalAlign: "text-bottom" }}
+    >
+      <path d="M1.5 3.25a2.25 2.25 0 1 1 3 2.122v5.256a2.251 2.251 0 1 1-1.5 0V5.372A2.25 2.25 0 0 1 1.5 3.25Zm5.677-.434a.75.75 0 0 1 .612.865l-.621 2.483a.75.75 0 0 1-1.484-.37l.621-2.483a.75.75 0 0 1 .872-.495ZM11.5 3.25a2.25 2.25 0 1 1 4.5 0 2.25 2.25 0 0 1-4.5 0Zm-3.25.75a.75.75 0 0 0-1.5 0v5.25a.75.75 0 0 0 1.5 0Z"></path>
+      <path d="M14.25 5.372a2.25 2.25 0 0 1-1.5-2.122v-.002a2.25 2.25 0 0 1 1.5 2.122Z"></path>
+    </svg>
+  );
+};
 
 app.get("/", (c) => {
-  // ビルド時には、この部分でprs.jsonのデータが使用される
-  const prs = loadPRs();
-  const totalPRs = prs.length;
-  const mergedPRs = prs.filter((pr) => pr.state === "merged").length;
-  const openPRs = prs.filter((pr) => pr.state === "open").length;
+  const data = loadPRsData();
 
   return c.html(
-    <html>
+    <html lang="en">
       <head>
-        <title>My GitHub Contributions Portfolio</title>
+        <title>{data ? `${data.user_name}'s Contributions` : "My Contributions"}</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <style>{`
+          :root {
+            --color-bg: #0d1117;
+            --color-text: #c9d1d9;
+            --color-text-secondary: #8b949e;
+            --color-border: #30363d;
+            --color-link: #58a6ff;
+          }
           * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
           }
-          
           body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            line-height: 1.6;
-            color: #24292e;
-            background: #f6f8fa;
-            padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+            line-height: 1.5;
+            background-color: var(--color-bg);
+            color: var(--color-text);
           }
-          
-          .container {
-            max-width: 1200px;
-            margin: 0 auto;
-          }
-          
-          .header {
-            text-align: center;
-            margin-bottom: 40px;
-            background: white;
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-          }
-          
-          .header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-          }
-          
-          .stats {
-            display: flex;
-            justify-content: center;
-            gap: 30px;
-            margin-top: 20px;
-          }
-          
-          .stat {
-            text-align: center;
-          }
-          
-          .stat-number {
-            font-size: 2rem;
-            font-weight: bold;
-            color: #0366d6;
-          }
-          
-          .pr-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
-            gap: 20px;
-          }
-          
-          .pr-card {
-            background: white;
-            border-radius: 12px;
-            padding: 24px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            transition: transform 0.2s, box-shadow 0.2s;
-          }
-          
-          .pr-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-          }
-          
-          .pr-header {
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-            margin-bottom: 16px;
-          }
-          
-          .state-icon {
-            font-size: 1.2rem;
-            margin-top: 2px;
-          }
-          
-          .pr-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            line-height: 1.4;
-          }
-          
-          .pr-title a {
-            color: #24292e;
+          a {
+            color: inherit;
             text-decoration: none;
           }
-          
-          .pr-title a:hover {
-            color: #0366d6;
+          a:hover {
+            text-decoration: underline;
+            color: var(--color-link);
           }
-          
+          .container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 20px;
+          }
+          .header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 16px;
+          }
+          .header-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+          }
+          .header-info h1 {
+            font-size: 24px;
+            font-weight: 600;
+          }
+          .header-info p {
+            color: var(--color-text-secondary);
+            font-size: 14px;
+          }
+          .pr-list {
+            border-top: 1px solid var(--color-border);
+            padding-top: 24px;
+            margin-top: 24px;
+          }
+          .pr-item {
+            display: flex;
+            gap: 16px;
+            padding: 12px 8px;
+            border-bottom: 1px solid var(--color-border);
+          }
+          .pr-item:last-child {
+            border-bottom: none;
+          }
+          .repo-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            margin-top: 2px;
+          }
+          .pr-details {
+            flex-grow: 1;
+          }
+          .pr-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+          }
+          .pr-repo {
+            font-size: 14px;
+            color: var(--color-text-secondary);
+          }
           .pr-meta {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            align-items: center;
-            font-size: 0.85rem;
-            color: #586069;
-            border-top: 1px solid #e1e4e8;
-            padding-top: 16px;
+            min-width: 100px;
+            text-align: right;
+            font-size: 14px;
+            color: var(--color-text-secondary);
           }
-          
-          .repo-info {
-            display: flex;
-            align-items: center;
-            gap: 6px;
+          .pr-meta span {
+            display: block;
           }
-          
+          .pr-meta .pr-date {
+            font-size: 12px;
+          }
           .no-prs {
             text-align: center;
-            padding: 60px 20px;
-            color: #586069;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-          }
-          
-          @media (max-width: 768px) {
-            .pr-grid {
-              grid-template-columns: 1fr;
-            }
-            
-            .stats {
-              flex-direction: column;
-              gap: 20px;
-            }
+            padding: 40px;
+            border: 1px solid var(--color-border);
+            border-radius: 6px;
           }
         `}</style>
       </head>
       <body>
         <div class="container">
-          <header class="header">
-            <h1>My GitHub Contributions Portfolio</h1>
-            <div class="stats">
-              <div class="stat">
-                <div class="stat-number">{totalPRs}</div>
-                <div>Total PRs</div>
-              </div>
-              <div class="stat">
-                <div class="stat-number">{mergedPRs}</div>
-                <div>Merged</div>
-              </div>
-              <div class="stat">
-                <div class="stat-number">{openPRs}</div>
-                <div>Open</div>
-              </div>
-              <div class="stat">
-                <div class="stat-number">{totalPRs - mergedPRs - openPRs}</div>
-                <div>Closed</div>
-              </div>
-            </div>
-          </header>
+          {data ? (
+            <>
+              <header class="header">
+                <img src={data.avatar} alt="User avatar" class="header-avatar" />
+                <div class="header-info">
+                  <h1>{data.user_name} is Contributing...</h1>
+                  <p>{data.user}'s recent pull requests on GitHub</p>
+                </div>
+              </header>
 
-          <main>
-            {totalPRs === 0 ? (
-              <div class="no-prs">
-                <h2>No pull requests found</h2>
-                <p>Pull request data will appear here once fetched.</p>
-              </div>
-            ) : (
-              <div class="pr-grid">
-                {prs.map((pr) => (
-                  <article class="pr-card">
-                    <div class="pr-header">
-                      <span class="state-icon">{getStateIcon(pr.state)}</span>
-                      <h2 class="pr-title">
-                        <a
-                          href={pr.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
+              <main class="pr-list">
+                {data.prs.map((pr) => (
+                  <article class="pr-item">
+                    <a href={`https://github.com/${pr.repo.split('/')[0]}`} target="_blank" rel="noopener noreferrer">
+                      <img src={`https://github.com/${pr.repo.split('/')[0]}.png`} alt="Repository owner avatar" class="repo-avatar" />
+                    </a>
+                    <div class="pr-details">
+                      <div class="pr-title">
+                        <a href={pr.url} target="_blank" rel="noopener noreferrer">
+                          <PullRequestIcon state={pr.state} />
                           {pr.title}
                         </a>
-                      </h2>
-                    </div>
-
-                    <div class="pr-meta">
-                      <div class="repo-info">
-                        <a
-                          href={`https://github.com/${pr.repo}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          {pr.repo}
-                        </a>
                       </div>
-                      <span>•</span>
-                      <span>#{pr.number}</span>
-                      <span>•</span>
-                      <span>{formatDate(pr.created_at)}</span>
+                      <div class="pr-repo">
+                        {pr.repo}
+                      </div>
+                    </div>
+                    <div class="pr-meta">
+                      <a href={pr.url} target="_blank" rel="noopener noreferrer">
+                        <span class="pr-number">#{pr.number}</span>
+                        <span class="pr-date">{timeAgo(pr.created_at)}</span>
+                      </a>
                     </div>
                   </article>
                 ))}
-              </div>
-            )}
-          </main>
+              </main>
+            </>
+          ) : (
+            <div class="no-prs">
+              <h2>No pull request data found</h2>
+              <p>Run the fetch script or check the data/prs.json file.</p>
+            </div>
+          )}
         </div>
       </body>
     </html>
