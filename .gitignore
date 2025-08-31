@@ -14,7 +14,6 @@ data/
 
 # deps
 node_modules/
-.wrangler
 
 # env
 .env
