@@ -6,21 +6,10 @@ import { dirname } from "path";
 // Load environment variables from .env file (optional)
 try {
   config();
-} catch (e) {
-  // .envがなくても無視
-}
+} catch (e) {}
 
-console.log("🔍 Checking GitHub token availability...");
-console.log("process.env.GITHUB_TOKEN exists:", !!process.env.GITHUB_TOKEN);
-console.log(
-  "process.env.GITHUB_TOKEN length:",
-  process.env.GITHUB_TOKEN ? process.env.GITHUB_TOKEN.length : 0
-);
-
-// GitHub Actions環境での認証設定
 const octokit = new Octokit({
   auth: process.env.GITHUB_TOKEN,
-  // GitHub Actions環境での最適化
   baseUrl: "https://api.github.com",
   log: {
     debug: () => {},
@@ -33,7 +22,6 @@ const octokit = new Octokit({
 async function getUser(username) {
   try {
     console.log(`🔐 Fetching user info for: ${username}`);
-    // api.remote.js.mdと同じエンドポイントを使用
     const userResponse = await octokit.request("GET /users/{username}", {
       username: username,
     });
@@ -63,33 +51,28 @@ async function getUser(username) {
 
 async function fetchAllPRs() {
   try {
-    // 環境変数からユーザー名を取得（デフォルトは認証されたユーザー）
-    const targetUsername =
-      process.env.TARGET_USERNAME || process.env.GITHUB_ACTOR || "natsuki";
+    const targetUsername = process.env.GITHUB_ACTOR || "";
     const user = await getUser(targetUsername);
     console.log(`📋 Fetching PRs for user: ${user.username}`);
 
     const includeOwnRepos = process.env.INCLUDE_OWN_PRS === "true";
-    // api.remote.js.mdと同じクエリ構造
     const query = includeOwnRepos
       ? `type:pr+author:"${user.username}"`
       : `type:pr+author:"${user.username}"+-user:"${user.username}"`;
 
     console.log(`🔍 Search query: ${query}`);
 
-    // api.remote.js.mdと同じパラメータでGitHub Search APIを使用
     const { data } = await octokit.request("GET /search/issues", {
       q: query,
       per_page: 100,
       page: 1,
-      advanced_search: "true", // api.remote.js.mdと同じパラメータ
+      advanced_search: "true",
     });
 
     console.log(
       `📊 Found ${data.total_count} total PRs, processing ${data.items.length} items`
     );
 
-    // api.remote.js.mdと同じフィルタリング処理
     const allPRs = data.items
       .filter(
         (pr) => !(pr.state === "closed" && pr.pull_request?.merged_at == null)
@@ -103,10 +86,8 @@ async function fetchAllPRs() {
         number: pr.number,
       }));
 
-    // データディレクトリの作成
     mkdirSync(dirname("data/prs.json"), { recursive: true });
 
-    // PRデータをJSONファイルに保存
     const outputData = {
       user: user.username,
       user_name: user.name,
@@ -120,7 +101,6 @@ async function fetchAllPRs() {
 
     console.log(`✅ Successfully saved ${allPRs.length} PRs to data/prs.json`);
 
-    // 統計情報の表示
     const merged = allPRs.filter((pr) => pr.state === "merged").length;
     const open = allPRs.filter((pr) => pr.state === "open").length;
     const closed = allPRs.filter((pr) => pr.state === "closed").length;
@@ -131,7 +111,6 @@ async function fetchAllPRs() {
     console.log(`   Closed: ${closed}`);
     console.log(`   Total: ${allPRs.length}`);
 
-    // 最初の数件のPRを表示して確認
     if (allPRs.length > 0) {
       console.log(`\n📝 Sample PRs:`);
       allPRs.slice(0, 3).forEach((pr, index) => {
@@ -145,7 +124,6 @@ async function fetchAllPRs() {
   } catch (error) {
     console.error("❌ Error fetching PRs:", error);
 
-    // より詳細なエラー情報を表示
     if (error.response) {
       console.error("Response status:", error.response.status);
       console.error("Response headers:", error.response.headers);
@@ -165,7 +143,6 @@ async function fetchAllPRs() {
   }
 }
 
-// メイン処理の実行
 console.log("🚀 Starting PR fetch process...");
 fetchAllPRs()
   .then(() => {
