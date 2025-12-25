@@ -5,7 +5,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "generate": "vite build --mode ssg",
+    "generate": "vite build --config vite.config.client.ts && vite build --mode ssg && node scripts/copy-data.js",
     "fetch-prs": "node scripts/fetch-prs.js"
   },
   "dependencies": {
