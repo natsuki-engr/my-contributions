@@ -1,6 +1,7 @@
 # prod
 dist/
 data/
+.client-build/
 
 # dev
 .yarn/
