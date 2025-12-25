@@ -22,6 +22,8 @@ async function main() {
   
   if (root) {
     render(<App data={data} />, root);
+  } else {
+    console.error("Root element not found");
   }
 }
 
