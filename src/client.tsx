@@ -1,7 +1,8 @@
 import { render } from "hono/jsx/dom";
 import { App, type PRData } from "./components";
 
-// For client-side hydration, we can optionally refresh the data
+// For SSG builds, the HTML is already pre-rendered
+// This script provides optional client-side enhancements
 async function loadPRsData(): Promise<PRData | null> {
   try {
     const response = await fetch("/prs.json");
@@ -18,23 +19,22 @@ async function loadPRsData(): Promise<PRData | null> {
 }
 
 async function main() {
-  // On initial load, the HTML is already pre-rendered by SSG
-  // We can optionally re-render with fresh data for client-side updates
   const root = document.getElementById("root");
   
-  if (root) {
-    // Only fetch and re-render if needed (e.g., for client-side updates)
-    // For now, we'll just enable this for client-side interactivity
-    // The pre-rendered content from SSG will be shown immediately
-    
-    // Optionally reload data on client-side
-    const data = await loadPRsData();
-    if (data) {
-      render(<App data={data} />, root);
-    }
-  } else {
+  if (!root) {
     console.error("Root element not found");
+    return;
   }
+
+  // For SSG, the HTML is already pre-rendered with data
+  // We only re-render if we need client-side updates
+  // For now, we keep the pre-rendered content and just enable future interactivity
+  
+  // Optionally: Uncomment below to fetch and re-render with fresh data
+  // const data = await loadPRsData();
+  // if (data) {
+  //   render(<App data={data} />, root);
+  // }
 }
 
 main();
