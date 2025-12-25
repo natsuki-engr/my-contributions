@@ -3,9 +3,9 @@ import { App, type PRData } from "./components";
 
 async function loadPRsData(): Promise<PRData | null> {
   try {
-    const response = await fetch("/data/prs.json");
+    const response = await fetch("/prs.json");
     if (!response.ok) {
-      console.log("data/prs.json not found.");
+      console.log("prs.json not found.");
       return null;
     }
     const data = await response.json();
