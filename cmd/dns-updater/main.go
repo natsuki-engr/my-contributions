@@ -4,19 +4,44 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"time"
+
+	"github.com/joho/godotenv"
 )
 
 type graphQLRequest struct {
-	Query string `json:"query"`
+	Query     string           `json:"query"`
+	Variables graphQLVariables `json:"variables"`
+}
+
+type graphQLVariables struct {
+	From string `json:"from"`
+	To   string `json:"to"`
 }
 
 type graphQLResponse struct {
 	Data struct {
 		Viewer struct {
-			Login string `json:"login"`
+			Login                   string `json:"login"`
+			ContributionsCollection struct {
+				TotalCommitContributions            int `json:"totalCommitContributions"`
+				TotalIssueContributions             int `json:"totalIssueContributions"`
+				TotalPullRequestContributions       int `json:"totalPullRequestContributions"`
+				TotalPullRequestReviewContributions int `json:"totalPullRequestReviewContributions"`
+				TotalRepositoryContributions        int `json:"totalRepositoryContributions"`
+				RestrictedContributionsCount        int `json:"restrictedContributionsCount"`
+				ContributionCalendar                struct {
+					Weeks []struct {
+						ContributionDays []struct {
+							Date              string `json:"date"`
+							ContributionCount int    `json:"contributionCount"`
+						} `json:"contributionDays"`
+					} `json:"weeks"`
+				} `json:"contributionCalendar"`
+			} `json:"contributionsCollection"`
 		} `json:"viewer"`
 	}
 	Errors []struct {
@@ -25,14 +50,51 @@ type graphQLResponse struct {
 }
 
 func main() {
-	token := os.Getenv("GITHUB_TOKEN")
+	if err := godotenv.Load(); err != nil && !os.IsNotExist(err) {
+		log.Fatal("load .env:", err)
+	}
+
+	token := os.Getenv("CONTRIBUTIONS_TOKEN")
 	if token == "" {
-		fmt.Fprintln(os.Stderr, "GITHUB_TOKEN is not set")
+		fmt.Fprintln(os.Stderr, "CONTRIBUTIONS_TOKEN is not set")
 		os.Exit(1)
 	}
 
+	tokyo, err := time.LoadLocation("Asia/Tokyo")
+	if err != nil {
+		log.Fatal("load JST timezone:", err)
+	}
+	targetDate := time.Now().In(tokyo).AddDate(0, 0, -1)
+	from := time.Date(targetDate.Year(), targetDate.Month(), targetDate.Day(), 0, 0, 0, 0, tokyo)
+	to := from.AddDate(0, 0, 1).Add(-time.Nanosecond)
+	date := from.Format("2006-01-02")
+
 	body, err := json.Marshal(graphQLRequest{
-		Query: `query { viewer { login } }`,
+		Query: `query($from: DateTime!, $to: DateTime!) {
+			viewer {
+				login
+				contributionsCollection(from: $from, to: $to) {
+					totalCommitContributions
+					totalIssueContributions
+					totalPullRequestContributions
+					totalPullRequestReviewContributions
+					totalRepositoryContributions
+					restrictedContributionsCount
+					contributionCalendar {
+						weeks {
+							contributionDays {
+								date
+								contributionCount
+							}
+						}
+					}
+				}
+			}
+		}`,
+		Variables: graphQLVariables{
+			From: from.Format(time.RFC3339Nano),
+			To:   to.Format(time.RFC3339Nano),
+		},
 	})
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "encode request:", err)
@@ -72,9 +134,27 @@ func main() {
 	}
 
 	if len(result.Errors) > 0 {
-		fmt.Fprintln(os.Stderr, "GraphQL errorr:", result.Errors[0].Message)
+		fmt.Fprintln(os.Stderr, "GraphQL error:", result.Errors[0].Message)
 		os.Exit(1)
 	}
 
-	fmt.Println("Authenticated as:", result.Data.Viewer.Login)
+	collection := result.Data.Viewer.ContributionsCollection
+	var dailyTotal int
+	for _, week := range collection.ContributionCalendar.Weeks {
+		for _, day := range week.ContributionDays {
+			if day.Date == date {
+				dailyTotal = day.ContributionCount
+			}
+		}
+	}
+
+	fmt.Printf("User: %s\n", result.Data.Viewer.Login)
+	fmt.Printf("Date: %s\n", date)
+	fmt.Printf("Total contributions: %d\n", dailyTotal)
+	fmt.Printf("Commits: %d\n", collection.TotalCommitContributions)
+	fmt.Printf("Issues: %d\n", collection.TotalIssueContributions)
+	fmt.Printf("Pull requests: %d\n", collection.TotalPullRequestContributions)
+	fmt.Printf("Pull request reviews: %d\n", collection.TotalPullRequestReviewContributions)
+	fmt.Printf("Repositories created: %d\n", collection.TotalRepositoryContributions)
+	fmt.Printf("Restricted contributions: %d\n", collection.RestrictedContributionsCount)
 }
